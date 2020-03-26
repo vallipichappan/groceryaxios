@@ -3,10 +3,6 @@ import axios from 'axios'
 
 export default{
   
-
-  
- 
-  
     extends:Line,
     data: () => ({
         results:[],
