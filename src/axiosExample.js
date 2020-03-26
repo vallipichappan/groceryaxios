@@ -2,6 +2,11 @@ import {Line} from 'vue-chartjs'
 import axios from 'axios'
 
 export default{
+  
+
+  
+ 
+  
     extends:Line,
     data: () => ({
         results:[],
@@ -10,12 +15,21 @@ export default{
           labels:[],
           datasets: [
             {
-              label: 'Bitcoin price in USD',
+              label: 'Number of Cases',
+               data:[],
+             // backgroundColor:['aqua','lightgreen','red','orange'],
+              borderWidth:0.5,
+              borderColor:"magenta",
+              fill: false,
+              
+            
+            },
+            {
+              label: 'Number of deaths',
                data:[],
               //backgroundColor:['aqua','lightgreen','red','orange'],
               borderWidth:0.5,
-              borderColor:"magenta",
-              backgroundColor:'orange',
+              borderColor:"red",
               fill:false
             }
           ]
@@ -27,16 +41,29 @@ export default{
         }
       }),
     methods:{
+
     
     fetchData : function(){
-        axios.get('https://api.coindesk.com/v1/bpi/historical/close.json').then(response=>{
-        this.results=response.data.bpi
+        axios.get('http://covid19.soficoop.com/country/us').then(response=>{
+        this.results=response.data.snapshots
         
-        for(let key in this.results){
-            this.chartdata.datasets[0].data.push(this.results[key])
-            this.chartdata.labels.push(key+'')
+        var date = this.results[0].timestamp.slice(0,10)
+        this.chartdata.datasets[0].data.push(this.results[0].cases)
             
+            this.chartdata.datasets[1].data.push(this.results[0].deaths)
+            this.chartdata.labels.push(this.results[0].timestamp+'')
+        for(var i = 1; i < this.results.length; i++){
+          if(this.results[i].timestamp.slice(0,10)!=date){
+            date = this.results[i].timestamp.slice(0,10)
+                     
+            this.chartdata.datasets[0].data.push(this.results[i].cases)
+            
+            this.chartdata.datasets[1].data.push(this.results[i].deaths)
+            this.chartdata.labels.push(this.results[i].timestamp+'')
+
+          }
         }
+       
         this.renderChart(this.chartdata,this.options)
             
     })
@@ -45,11 +72,11 @@ export default{
     
     },
      mounted(){
+      
        // console.log('Do I come here')
         this.fetchData()
-        
+      
      }
-
     
     
     
